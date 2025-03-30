@@ -1,11 +1,12 @@
 package com.sumin.weatherapp.domain.repository
 
+import com.sumin.weatherapp.data.local.model.CityDbModel
 import com.sumin.weatherapp.domain.entity.City
 import kotlinx.coroutines.flow.Flow
 
 interface FavouriteRepository {
 
-    val favouriteCities: Flow<City>
+    val favouriteCities: Flow<List<City>>
 
     fun observeIsFavourite(cityId: Int): Flow<Boolean>
 
