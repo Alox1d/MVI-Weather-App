@@ -9,6 +9,7 @@ import javax.inject.Singleton
 @Component(
     modules = [
         DataModule::class,
+        PresentationModule::class,
     ]
 )
 interface ApplicationComponent {
