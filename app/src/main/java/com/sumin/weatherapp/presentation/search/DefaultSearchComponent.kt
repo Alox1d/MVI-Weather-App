@@ -6,18 +6,21 @@ import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
 import com.sumin.weatherapp.domain.entity.City
 import com.sumin.weatherapp.presentation.extensions.componentScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class DefaultSearchComponent @Inject constructor(
-    private val openReason: OpenReason,
+class DefaultSearchComponent @AssistedInject constructor(
     private val storeFactory: SearchStoreFactory,
-    private val onBackClick: () -> Unit,
-    private val onCitySavedToFavourite: () -> Unit,
-    private val onForecastRequested: (City) -> Unit,
-    componentContext: ComponentContext,
+    @Assisted("openReason") openReason: OpenReason,
+    @Assisted("onBackClick") onBackClick: () -> Unit, // т.к. совпадают возвращаемые типы
+    @Assisted("onCitySavedToFavourite") onCitySavedToFavourite: () -> Unit,
+    @Assisted("onForecastRequested") onForecastRequested: (City) -> Unit,
+    @Assisted("componentContext") componentContext: ComponentContext,
 ) : SearchComponent, ComponentContext by componentContext {
 
     private val store = instanceKeeper.getStore { storeFactory.create(openReason) }
@@ -59,5 +62,16 @@ class DefaultSearchComponent @Inject constructor(
 
     override fun onClickCity(city: City) {
         store.accept(SearchStore.Intent.CLickCity(city))
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            @Assisted("openReason") openReason: OpenReason,
+            @Assisted("onBackClick") onBackClick: () -> Unit, // т.к. совпадают возвращаемые типы
+            @Assisted("onCitySavedToFavourite") onCitySavedToFavourite: () -> Unit,
+            @Assisted("onForecastRequested") onForecastRequested: (City) -> Unit,
+            @Assisted("componentContext") componentContext: ComponentContext,
+        ): DefaultSearchComponent
     }
 }

@@ -4,23 +4,26 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
-import com.bumptech.glide.Glide.init
 import com.sumin.weatherapp.domain.entity.City
 import com.sumin.weatherapp.presentation.extensions.componentScope
+import com.sumin.weatherapp.presentation.search.DefaultSearchComponent
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class DefaultFavouriteComponent @Inject constructor(
-    private val favouriteStoreFactory: FavouriteStoreFactory,
-    private val onItemCityClick: (City) -> Unit, // заинжектить коллебки - отдельная тема
-    private val onAddFavouriteClick: () -> Unit,
-    private val onSearchClick: () -> Unit,
-    componentContext: ComponentContext,
+class DefaultFavouriteComponent @AssistedInject constructor(
+    private val storeFactory: FavouriteStoreFactory,
+    @Assisted("onItemCityClick") onItemCityClick: (City) -> Unit, // заинжектить коллебки - отдельная тема
+    @Assisted("onAddFavouriteClick") onAddFavouriteClick: () -> Unit,
+    @Assisted("onSearchClick") onSearchClick: () -> Unit,
+    @Assisted("componentContext") componentContext: ComponentContext,
 ) : FavouriteComponent, ComponentContext by componentContext {
 
-    private val store = instanceKeeper.getStore { favouriteStoreFactory.create() }
+    private val store = instanceKeeper.getStore { storeFactory.create() }
     private val scope = componentScope()
 
     init {
@@ -55,5 +58,15 @@ class DefaultFavouriteComponent @Inject constructor(
 
     override fun onCityItemClick(city: City) {
         store.accept(FavouriteStore.Intent.CityItemClick(city))
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            @Assisted("onItemCityClick") onItemCityClick: (City) -> Unit, // заинжектить коллебки - отдельная тема
+            @Assisted("onAddFavouriteClick") onAddFavouriteClick: () -> Unit,
+            @Assisted("onSearchClick") onSearchClick: () -> Unit,
+            @Assisted("componentContext") componentContext: ComponentContext,
+        ): DefaultFavouriteComponent
     }
 }
