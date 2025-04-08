@@ -18,6 +18,7 @@ class MainActivity : ComponentActivity() {
         (applicationContext as WeatherApp).applicationComponent.inject(this)
 
         super.onCreate(savedInstanceState)
+
         setContent {
             RootContent(component = rootComponentFactory.create(defaultComponentContext()))
         }
